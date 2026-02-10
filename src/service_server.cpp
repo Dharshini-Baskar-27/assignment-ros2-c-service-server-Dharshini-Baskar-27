@@ -1,29 +1,33 @@
 #include "rclcpp/rclcpp.hpp"
-#include "std_srvs/srv/empty.hpp"
+#include "example_interfaces/srv/add_two_ints.hpp"
+
+using std::placeholders::_1;
+using std::placeholders::_2;
 
 class ServiceServerNode : public rclcpp::Node
 {
 public:
   ServiceServerNode() : Node("service_server_node")
   {
-    service_ = this->create_service<std_srvs::srv::Empty>(
-      "reset_counter",
-      std::bind(&ServiceServerNode::handle_service, this,
-                std::placeholders::_1, std::placeholders::_2)
-    );
+    service_ = this->create_service<example_interfaces::srv::AddTwoInts>(
+      "add_two_ints",
+      std::bind(&ServiceServerNode::handle_service, this, _1, _2));
 
-    RCLCPP_INFO(this->get_logger(), "Service Server ready: /reset_counter");
+    RCLCPP_INFO(this->get_logger(), "Service Server ready: /add_two_ints");
   }
 
 private:
   void handle_service(
-    const std::shared_ptr<std_srvs::srv::Empty::Request>,
-    std::shared_ptr<std_srvs::srv::Empty::Response>)
+    const std::shared_ptr<example_interfaces::srv::AddTwoInts::Request> request,
+    std::shared_ptr<example_interfaces::srv::AddTwoInts::Response> response)
   {
-    RCLCPP_INFO(this->get_logger(), "Reset service called");
+    response->sum = request->a + request->b;
+    RCLCPP_INFO(this->get_logger(),
+      "Received request: a=%ld b=%ld → sum=%ld",
+      request->a, request->b, response->sum);
   }
 
-  rclcpp::Service<std_srvs::srv::Empty>::SharedPtr service_;
+  rclcpp::Service<example_interfaces::srv::AddTwoInts>::SharedPtr service_;
 };
 
 int main(int argc, char **argv)
@@ -33,3 +37,4 @@ int main(int argc, char **argv)
   rclcpp::shutdown();
   return 0;
 }
+
