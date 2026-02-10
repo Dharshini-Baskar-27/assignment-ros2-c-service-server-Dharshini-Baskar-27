@@ -20,4 +20,18 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+find_package(std_srvs REQUIRED)
+
+add_executable(service_server src/service_server.cpp)
+
+ament_target_dependencies(service_server
+  rclcpp
+  std_srvs
+)
+
+install(TARGETS
+  service_server
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 ament_package()
